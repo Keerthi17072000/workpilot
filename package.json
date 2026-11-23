@@ -1,0 +1,20 @@
+{
+  "name": "workpilot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:web": "pnpm --filter @workpilot/web dev",
+    "dev:api": "pnpm --filter @workpilot/api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "dev": "pnpm -r --parallel dev",
+    "local:env": "bash scripts/local-env.sh"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.17",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}
