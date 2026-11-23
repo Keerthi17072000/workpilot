@@ -45,6 +45,16 @@ beforeEach(() => {
   app = createApp({ repo: mem.repo, registry: defaultRegistry(), env, stateRing, fetch: providerFetch, authenticate: async (t) => t.replace("tok-", "") || null });
 });
 
+describe("cors", () => {
+  it("allows the site's origin even when APP_URL has a sub-path (GitHub Pages)", async () => {
+    const a = createApp({ repo: mem.repo, registry: defaultRegistry(), env: { ...env, APP_URL: "https://me.github.io/workpilot" }, stateRing, fetch: providerFetch, authenticate: async () => null });
+    const r = await a.request("/v1/providers", { method: "OPTIONS", headers: { origin: "https://me.github.io", "access-control-request-method": "GET" } });
+    expect(r.headers.get("access-control-allow-origin")).toBe("https://me.github.io");
+    const other = await a.request("/health", { headers: { origin: "https://evil.example" } });
+    expect(other.headers.get("access-control-allow-origin")).not.toBe("https://evil.example");
+  });
+});
+
 describe("auth", () => {
   it("rejects missing or invalid tokens", async () => {
     expect((await app.request("/v1/providers")).status).toBe(401);

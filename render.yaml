@@ -1,0 +1,17 @@
+# Render Blueprint: one free web service for the API. Values marked sync:false are asked for in the dashboard.
+services:
+  - type: web
+    name: workpilot-api
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile
+    startCommand: pnpm --filter @workpilot/api start:prod
+    healthCheckPath: /health
+    envVars:
+      - { key: NODE_VERSION, value: "22" }
+      - { key: SUPABASE_URL, sync: false }
+      - { key: SUPABASE_SERVICE_ROLE_KEY, sync: false }   # the Supabase *secret* key (server only)
+      - { key: APP_URL, value: https://keerthi17072000.github.io/workpilot }
+      - { key: API_PUBLIC_URL, value: https://workpilot-api.onrender.com } # change if Render gives a different URL
+      - { key: TOKEN_ENCRYPTION_KEY, generateValue: true }
+      - { key: OAUTH_STATE_KEY, generateValue: true }

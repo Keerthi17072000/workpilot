@@ -23,7 +23,7 @@ export function createApp(d: Deps) {
   const appUrl = d.env.APP_URL ?? "http://localhost:5173";
   const redirectUri = (p: string) => `${d.env.API_PUBLIC_URL ?? "http://localhost:8787"}/v1/oauth/callback/${p}`;
 
-  app.use("*", cors({ origin: appUrl }));
+  app.use("*", cors({ origin: new URL(appUrl).origin })); // browsers send the origin only, never the /subpath
   app.get("/health", (c) => c.json({ ok: true }));
 
   // Provider callback has no Authorization header (it's a browser redirect); identity comes from the sealed state.

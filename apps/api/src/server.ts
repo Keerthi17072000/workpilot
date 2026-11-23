@@ -16,5 +16,5 @@ const app = createApp({
   authenticate: async (token) => (await admin.auth.getUser(token)).data.user?.id ?? null,
 });
 
-const port = Number(process.env.API_PORT ?? 8787);
+const port = Number(process.env.PORT ?? process.env.API_PORT ?? 8787) // hosts set PORT;
 serve({ fetch: app.fetch, port }, () => console.log(`WorkPilot API on :${port}`));
