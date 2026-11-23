@@ -12,6 +12,8 @@ import type { Prefs } from "@/lib/types";
 import { timeAgo } from "@/lib/utils";
 import { useTheme } from "@/stores/theme";
 
+// Exactly the columns clients may update (see grants in the migration); selecting * would also send user_id/timestamps back on save.
+const PREF_COLUMNS = "inactivity_threshold_minutes,quiet_hours_start,quiet_hours_end,quiet_days,suppress_during_meetings,briefing_time,weekly_report_day,require_approval,llm_provider";
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const hhmm = (t: string | null) => (t ? t.slice(0, 5) : "");
 
@@ -128,7 +130,7 @@ export function Settings() {
   const q = useQuery({
     queryKey: ["user_preferences", "all"],
     queryFn: async () => {
-      const [p, u] = await Promise.all([supabase.from("user_preferences").select("*").single(), supabase.from("users").select("timezone").single()]);
+      const [p, u] = await Promise.all([supabase.from("user_preferences").select(PREF_COLUMNS).single(), supabase.from("users").select("timezone").single()]);
       if (p.error) throw new Error(p.error.message);
       if (u.error) throw new Error(u.error.message);
       return { prefs: p.data as Prefs, timezone: u.data.timezone as string };

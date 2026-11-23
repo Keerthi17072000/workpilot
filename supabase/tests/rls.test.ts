@@ -46,6 +46,19 @@ describe("signup trigger", () => {
   });
 });
 
+describe("settings save", () => {
+  it("a user can update exactly the preference columns the Settings page sends", async () => {
+    const res = await as(alice, () => db.query(`update user_preferences set inactivity_threshold_minutes = 45,
+      quiet_hours_start = '22:00', quiet_hours_end = '07:00', quiet_days = '{0,6}', suppress_during_meetings = false,
+      briefing_time = '08:30', weekly_report_day = 4, require_approval = true, llm_provider = 'ollama' where user_id = $1`, [alice]));
+    expect(res.affectedRows).toBe(1);
+  });
+  it("sending server-managed columns (user_id, timestamps) is rejected", async () => {
+    await expect(as(alice, () => db.query("update user_preferences set user_id = user_id"))).rejects.toThrow(/permission denied/);
+    await expect(as(alice, () => db.query("update user_preferences set created_at = now()"))).rejects.toThrow(/permission denied/);
+  });
+});
+
 describe("row isolation", () => {
   it("a user sees only their own rows", async () => {
     const rows = await as(alice, async () => (await db.query<{ user_id: string }>("select user_id from notifications")).rows);
